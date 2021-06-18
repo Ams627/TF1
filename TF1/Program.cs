@@ -49,8 +49,8 @@ namespace TF1
                 //x.PrintSomething();
 
 
-                var f1 = new TypeFactory2<I1>();
-                var f2 = new TypeFactory2<I2>();
+                var f1 = new TypeFactory<I1>();
+                var f2 = new TypeFactory<I2>();
 
                 var x1 = f1.CreateInstance(nameof(X1));
                 x1.PrintSomething();

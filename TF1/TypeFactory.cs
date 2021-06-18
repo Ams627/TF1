@@ -1,31 +1,39 @@
 ﻿using System;
 using System.Linq;
 using System.Diagnostics;
-
-[assembly: TF1.Marker]
+using System.Collections.Generic;
 
 namespace TF1
 {
-    class TypeFactory<T, TMarker> where T : class
+    // why do we have a helper? because we only want to scan the assemblies for types once - this is done the
+    // first time the class is used for any purpose in the static constructor:
+    static class TypeFactoryHelper
+    {
+        static readonly List<Type> _types;
+        static TypeFactoryHelper()
+        {
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            _types = assemblies.SelectMany(x => x.GetTypes()).ToList();
+        }
+        public static IList<Type> Types => _types;
+    }
+    class TypeFactory<T> where T : class
     {
         private ILookup<string, Type> _longNameLookup;
         private ILookup<string, Type> _shortNameLookup;
-        public TypeFactory(bool allAssemblies = false)
+        
+        public TypeFactory()
         {
             var sw = new Stopwatch();
             sw.Start();
 
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            var markedAssemblies = assemblies.Where(x => x.CustomAttributes.Any(y => y.AttributeType == typeof(TMarker)));
-
-            var types = (allAssemblies ?  assemblies : markedAssemblies).SelectMany(x => x.GetTypes());
-
-            var relevantTypes = types.Where(x => typeof(T).IsAssignableFrom(x) && !x.IsInterface);
+            var relevantTypes = TypeFactoryHelper.Types.Where(x => typeof(T).IsAssignableFrom(x) && !x.IsInterface);
             _longNameLookup = relevantTypes.ToLookup(x => x.FullName);
             _shortNameLookup = relevantTypes.ToLookup(x => x.Name);
 
             sw.Stop();
-            Console.WriteLine($"{sw.ElapsedTicks / 10.0} microseconds");
+            Console.WriteLine($"TF2 ({typeof(T).Name}) {sw.ElapsedTicks / 10.0} microseconds");
         }
 
         public T CreateInstance(string typeName)
