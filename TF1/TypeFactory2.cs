@@ -19,6 +19,7 @@ namespace TF1
     {
         private ILookup<string, Type> _longNameLookup;
         private ILookup<string, Type> _shortNameLookup;
+        
         public TypeFactory2()
         {
             var sw = new Stopwatch();

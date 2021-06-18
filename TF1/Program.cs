@@ -44,9 +44,9 @@ namespace TF1
         {
             try
             {
-                var f = new TypeFactory<I1, MarkerAttribute>();
-                var x = f.CreateInstance(nameof(X1));
-                x.PrintSomething();
+                //var f = new TypeFactory<I1, MarkerAttribute>();
+                //var x = f.CreateInstance(nameof(X1));
+                //x.PrintSomething();
 
 
                 var f1 = new TypeFactory2<I1>();
